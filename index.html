@@ -11,7 +11,48 @@
 </head>
 <body>
     <div class="container">
-        <h1>英文單字卡</h1>
+        
+        <div class="header">
+            <h1>英文單字卡</h1>
+            
+            <div class="level-tabs" id="mainTabs">
+                <button class="level-tab" id="tab-level1_element" onclick="changeLevel('level1_element')">國小(6歲-12歲)</button>
+                <button class="level-tab" id="tab-level2_junior" onclick="changeLevel('level2_junior')">國中(13歲-15歲)</button>
+                <button class="level-tab" id="tab-level3_senior" onclick="changeLevel('level3_senior')">高中(16歲-18歲)</button>
+                <button class="level-tab" id="tab-level4_college" onclick="changeLevel('level4_college')">大學(19歲-22歲)</button>
+                <button class="level-tab" id="tab-level5_business" onclick="changeLevel('level5_business')">商務(22歲+)</button>
+                <button class="level-tab" id="tab-level6_hanlin" onclick="showHanlinPanel()">📘翰林專區</button>
+                <button class="level-tab" id="tab-custom" onclick="changeLevel('custom')">自訂題庫</button>
+            </div>
+            
+            <div class="hanlin-panel" id="hanlinPanel" style="display:none;">
+                <p>步驟 1: 選擇年級學期</p>
+                <div class="hanlin-grades" id="hanlinGrades">
+                    <button class="grade-btn" data-grade="grade_7A" onclick="showHanlinUnits('grade_7A')">七年級 上</button>
+                    <button class="grade-btn" data-grade="grade_7B" onclick="showHanlinUnits('grade_7B')">七年級 下</button>
+                    <button class="grade-btn" data-grade="grade_8A" onclick="showHanlinUnits('grade_8A')">八年級 上</button>
+                    <button class="grade-btn" data-grade="grade_8B" onclick="showHanlinUnits('grade_8B')">八年級 下</button>
+                    <button class="grade-btn" data-grade="grade_9A" onclick="showHanlinUnits('grade_9A')">九年級 上</button>
+                    <button class="grade-btn" data-grade="grade_9B" onclick="showHanlinUnits('grade_9B')">九年級 下</button>
+                </div>
+
+                <div class="hanlin-unit-selection" id="hanlinUnitSelection">
+                    <p>步驟 2: 選擇單元 (可複選)</p>
+                    <div id="unitCheckboxes" class="unit-checkbox-group">
+                        <div class="unit-message">請先選擇左側的年級。</div>
+                    </div>
+                    
+                    <div class="unit-controls">
+                        <button class="btn-select-all" onclick="toggleSelectAllUnits(true)">全選</button>
+                        <button class="btn-select-all" onclick="toggleSelectAllUnits(false)">全不選</button>
+                        <button class="btn-start-quiz" onclick="startHanlinQuiz()">開始測驗</button>
+                    </div>
+                </div>
+
+                <button class="grade-btn btn-back" onclick="hideHanlinPanel()">返回主等級</button>
+            </div>
+        </div>
+
 
         <div class="user-guide">
             <h3 class="guide-trigger" onclick="toggleGuide()">
@@ -24,17 +65,17 @@
                 <ol>
                     <li>點擊「發音」按鈕聆聽單字。</li>
                     <li>在「輸入框」中拼出單字。</li>
-                    <li>點擊「檢查」按鈕 (或按 Enter 鍵)。</li>
+                    <li>點擊「檢查」按鈕 (或按鍵盤的 Enter 鍵)。</li>
                     <li>(答案顯示後) 點擊「🔊」聆聽例句發音。</li>
                     <li>點擊「下一張」進行下個測驗。</li>
                 </ol>
                 <h3>⚠️ 注意事項</h3>
                 <ul>
-                    <li><strong>題庫範圍：</strong>預設題庫包含 500+ 個單字，適合**台灣國小中高年級 (約 9-12 歲)**至**國中基礎**階段的學童。</li>
-                    <li><strong>隨機抽題：</strong>每次測驗都是從題庫中**隨機抽取 100 題**。重整網頁會重新抽題。</li>
-                    <li><strong>自訂單字：</strong>您可以點擊「設定單字」來使用您自己的單字列表 (儲存後會覆蓋預設題庫)。</li>
-                    <li><strong>恢復預設：</strong>在「設定單字」視窗中，可按「恢復預設題庫」來清除您的自訂內容，恢復隨機抽題。</li>
-                    <li><strong>發音功能：</strong>發音由您的瀏覽器 (如 Chrome) 提供，請確保瀏覽器為最新版本。</li>
+                    <li><strong>題庫切換：</strong>請先在最上方選擇您要練習的等級（國小、國中等），或進入**「翰林專區」**選擇教材進度。</li>
+                    <li><strong>題庫範圍：</strong>「國小」題庫包含 500+ 單字；「國中」、「高中」、「大學」、「商務」皆已擴充至 1000+ 單字。</li>
+                    <li><strong>隨機抽題：</strong>測驗數量將根據您**所選單元的單字總數**與 100 題取較小值。</li>
+                    <li><strong>自訂單字：</strong>您可以點擊「設定單字」來編輯「自訂題庫」的內容。</li>
+                    <li><strong>恢復預設：</strong>在「設定單字」視窗中，可按「恢復預設題庫」來清除您的自訂內容，並切換回「國小」題庫。</li>
                 </ul>
             </div>
         </div>
@@ -42,7 +83,7 @@
 
         <div class="controls">
             <button onclick="openWordSettings()">設定單字</button>
-            <button onclick="shuffleAndReset()">重新排序 (100題)</button>
+            <button id="shuffleButton" onclick="shuffleAndReset()">重新排序 (100題)</button>
             <button onclick="resetAll()">重置進度</button>
         </div>
 
@@ -84,7 +125,7 @@
 
         <div id="wordSettingsModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:999; align-items:center; justify-content:center;">
             <div style="background:#fff; border-radius:8px; padding:20px; max-width:90vw; width:600px; box-shadow:0 2px 5px rgba(0,0,0,0.2); position:relative;">
-                <h2 style="margin-top:0;">設定自訂單字</h2>
+                <h2 style="margin-top:0;">設定「自訂題庫」</h2>
                 <p>請輸入單字，每行一個：</p>
                 <textarea id="customWordsTextarea" style="width:100%; height:250px; border-radius:5px; border:1px solid #ccc; padding:10px; box-sizing:border-box;" placeholder="請輸入自訂單字，每行一個..."></textarea>
                 

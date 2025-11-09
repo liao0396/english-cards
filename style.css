@@ -1,4 +1,4 @@
-/* 這是 'style.css' 檔案 (v3 - 修正版) */
+/* 這是 'style.css' 檔案 (v9 - 完整版) */
 
 /* --- 基本樣式 --- */
 body {
@@ -17,11 +17,182 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* --- 標題與等級切換 (Header) --- */
+.header {
+    text-align: center;
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 20px;
+}
+
 h1 {
     text-align: center;
     color: #333;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+/* 主要等級切換按鈕容器 */
+.level-tabs {
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: center;
+    gap: 8px; 
     margin-bottom: 20px;
 }
+
+.level-tab {
+    flex-grow: 1; 
+    flex-basis: 120px; 
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.level-tab:hover {
+    background-color: #e9ecef;
+}
+
+/* "被選中" 的按鈕樣式 */
+.level-tab.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* --- *** 翰林專區子面板樣式 (核心新增) *** --- */
+.hanlin-panel {
+    padding: 15px 15px 10px 15px;
+    border: 1px solid #007bff; 
+    border-radius: 8px;
+    background-color: #f8fbff; 
+    margin-bottom: 20px;
+}
+.hanlin-panel p {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin: 0 0 10px 0;
+    border-bottom: 1px dashed #ddd;
+    padding-bottom: 5px;
+}
+/* 年級選擇區 */
+.hanlin-grades {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.grade-btn {
+    background-color: #fff;
+    color: #28a745; /* 綠色 */
+    border: 1px solid #28a745;
+    padding: 10px 15px;
+    font-size: 15px;
+    flex-basis: calc(33.33% - 10px); /* 讓三個按鈕一行 */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.grade-btn:hover {
+    background-color: #e6ffed;
+}
+
+.grade-btn.active {
+    background-color: #28a745;
+    color: white;
+}
+
+/* 單元選擇區 */
+.hanlin-unit-selection {
+    margin-top: 15px;
+}
+.unit-message {
+    text-align: center;
+    color: #6c757d;
+    padding: 20px;
+    border: 1px dashed #ccc;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.unit-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    background-color: #fff;
+    margin-bottom: 15px;
+    min-height: 50px; 
+}
+
+.unit-checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    font-size: 14px;
+    user-select: none; 
+}
+
+.unit-checkbox-item input[type="checkbox"] {
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+/* 單元控制按鈕群 */
+.unit-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.unit-controls .btn-select-all {
+    background-color: #6c757d;
+    padding: 8px 12px;
+    font-size: 14px;
+    flex-grow: 0;
+}
+.unit-controls .btn-select-all:hover {
+    background-color: #5a6268;
+}
+
+.unit-controls .btn-start-quiz {
+    background-color: #28a745; /* 綠色 */
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    flex-grow: 1; /* 讓它佔據剩餘空間 */
+}
+.unit-controls .btn-start-quiz:hover {
+    background-color: #1e7e34;
+}
+
+.btn-back {
+    margin-top: 10px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    width: auto;
+    font-size: 14px;
+    padding: 8px 15px;
+}
+/* --- (翰林面板樣式結束) --- */
+
 
 /* --- 伸縮說明區塊 --- */
 .user-guide {
@@ -67,6 +238,7 @@ h1 {
     margin-bottom: 20px;
 }
 
+/* 確保通用 button 樣式 */
 button {
     background-color: #007bff;
     color: white;
@@ -76,7 +248,11 @@ button {
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
-    margin: 0 5px; 
+}
+
+/* 為 controls 內的按鈕加上 margin */
+.controls button {
+    margin: 0 5px;
 }
 
 button:hover {
@@ -123,7 +299,7 @@ button:disabled {
 .nav-btn {
     background-color: #6c757d;
     padding: 10px 20px;
-    position: relative; /* *** 修正：為了步驟 ⑤ 的定位 *** */
+    position: relative; 
 }
 
 .nav-btn:hover:not(:disabled) {
@@ -182,7 +358,7 @@ button:disabled {
     flex-direction: column;
     gap: 10px;
     margin-bottom: 20px;
-    position: relative; /* *** 修正：為了步驟 ② 和 ③ 的定位 *** */
+    position: relative; 
 }
 
 .speak-btn {
@@ -267,7 +443,7 @@ button:disabled {
     font-size: 16px;
     cursor: pointer;
     color: #007bff;
-    position: relative; /* *** 修正：為了步驟 ④ 的定位 *** */
+    position: relative; 
 }
 .sentence-speak-btn:hover {
     color: #0056b3;
@@ -308,33 +484,35 @@ button:disabled {
     gap: 10px;
     justify-content: center;
     margin-bottom: 10px;
-    position: relative; /* *** 修正：為了步驟 ① 的定位 *** */
+    position: relative; 
 }
 
-/* --- *** 修正：步驟提示標記 *** --- */
+/* --- 步驟提示標記 --- */
 .step-marker {
     position: absolute;
-    background-color: #dc3545; /* 紅色 */
+    background-color: #dc3545; 
     color: white;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%; /* 圓形 */
-    font-size: 14px;
+    width: 24px; /* 放大寬度 */
+    height: 24px; /* 放大高度 */
+    border-radius: 25%; /* 改成圓角方形 (可自行調整 % 或 5px) */
+    font-size: 15px; /* 放大字體 */
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
-    line-height: 1; /* 確保數字垂直置中 */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    line-height: 1; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4); /* 加深陰影 */
     z-index: 10;
-    top: -8px;  /* 統一預設 top */
-    left: -5px; /* 統一預設 left */
+    top: -10px; /* 配合新尺寸，稍微再往上移一點 */
+    left: -5px; /* 保持 left 屬性，讓子樣式 (step-marker-1 等) 覆蓋 */
 }
 
 /* 步驟 ① (發音按鈕) */
 .step-marker-1 { 
-    left: 5px; 
-} 
+    left: 50%; /* 將左側定位點設在容器的中間 */
+    transform: translateX(-50%); /* 透過 transform 將標記自身向左移 50% 寬度，使其水平置中 */
+    top: -10px; /* 稍微調整垂直位置，讓它更美觀 */
+}
 
 /* 步驟 ② (輸入框) */
 .step-marker-2 { 
@@ -350,8 +528,8 @@ button:disabled {
 
 /* 步驟 ④ (例句喇叭) */
 .step-marker-4 {
-    top: -5px;
-    left: -10px;
+    top: -24px;
+    left: -0px;
 }
 
 /* 步驟 ⑤ (下一張) */
@@ -359,8 +537,6 @@ button:disabled {
     top: -5px;
     left: -5px;
 }
-/* --- (提示樣式結束) --- */
-
 
 /* --- RWD 響應式網頁設計 (手機版) --- */
 @media (max-width: 600px) {
@@ -373,16 +549,25 @@ button:disabled {
     }
 
     h1 {
-        font-size: 28px; 
+        font-size: 24px; 
+    }
+    
+    .level-tabs {
+        gap: 5px; 
+    }
+    
+    .level-tab {
+        font-size: 11px;
+        flex-basis: 15%; 
     }
     
     .guide-trigger {
-        font-size: 16px;
-        padding: 12px 15px;
+        font-size: 15px;
+        padding: 10px 15px;
     }
 
     .word-display {
-        font-size: 28px; 
+        font-size: 26px; 
     }
 
     button, .btn {
@@ -391,17 +576,67 @@ button:disabled {
     }
 
     .controls button {
-        margin-top: 5px;
-        margin-bottom: 5px;
-    }
-
-    .stat-info {
-        flex-direction: column;
-        gap: 10px; 
+        margin: 5px 0; 
+        width: 100%; 
     }
     
-    /* 在手機上隱藏步驟提示 (太擠了) */
-    .step-marker {
-        display: none;
+    .grade-btn {
+        flex-basis: calc(50% - 10px); 
     }
-}
+    
+    .unit-controls {
+        flex-direction: column;
+    }
+    .unit-controls button {
+        width: 100%;
+        margin: 5px 0; 
+    }
+
+/* =================================================
+    請將以下 [新增] 的程式碼貼在 RWD 區塊的結尾處 
+    =================================================
+    */
+    .step-marker {
+        /* 在手機上，將 left 重設，改用 right 定位 */
+        left: auto;
+        right: -8px; /* 統一靠右，並稍微往外推 8px */
+        top: -8px;   /* 恢復一個通用的 top 值 */
+    }
+
+    /* 針對置中的 步驟① 保持原樣 */
+    .step-marker-1 {
+        left: 50%;
+        right: auto; /* 取消 right 定位 */
+        transform: translateX(-50%);
+        top: -10px; 
+    }
+
+    /* 重新調整 步驟② 的垂直位置 */
+    .step-marker-2 { 
+        top: 60px; 
+        right: -10px; /* 靠右 */
+        left: auto;
+    }
+
+    /* 重新調整 步驟③ 的垂直位置 */
+    .step-marker-3 { 
+        top: 110px; 
+        right: -10px; /* 靠右 */
+        left: auto; 
+    }
+    
+    /* 步驟 ④ (喇叭) */
+    .step-marker-4 {
+        top: -15px; 
+        right: 0px; /* 靠右 */
+        left: auto;
+    }
+
+    /* 步驟 ⑤ (下一張) */
+    .step-marker-5 {
+        top: -5px;
+        right: -5px; /* 靠右 */
+        left: auto;
+    }
+
+} /* <--- 貼在 RWD 區塊的這個大括號 "之前" */

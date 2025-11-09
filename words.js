@@ -8267,7 +8267,7 @@ const baseWordLists = {
     level6_hanlin: {
         // 七年級上學期
         grade_7A: {
-            Unit1: [
+            單元1: [
                 { word: 'handsome', translation: '英俊的', sentence_en: 'Brian: Your father is handsome.', sentence_zh: '布萊恩：你的父親很英俊。' },
                 { word: 'new', translation: '新的', sentence_en: 'Anna: Thank you. Ryan: Is your new school bag cool?', sentence_zh: '安娜：謝謝你。雷恩：你的新書包酷嗎？' },
                 { word: 'classmate', translation: '同學', sentence_en: 'Katie: That\'s Zoe. She\'s my classmate.', sentence_zh: '凱蒂：那位是柔依。她是我的同學。' },
@@ -8298,7 +8298,7 @@ const baseWordLists = {
                 { word: 'junior high school', translation: '國中', sentence_en: 'Their mom is a junior high school teacher.', sentence_zh: '他們的媽媽是個國中老師。' },
                 { word: 'baby', translation: '嬰兒', sentence_en: 'The baby\'s father is Mr. Martin.', sentence_zh: '這個嬰兒的爸爸是馬丁先生。' }
             ],
-            Unit2: [
+            單元2: [
                 { word: 'house', translation: '房子', sentence_en: 'Jimmy is not in the house.', sentence_zh: 'Jimmy 不在房子裡。' },
                 { word: 'parents', translation: '父母親', sentence_en: 'Her parents are very nice.', sentence_zh: '她的父母親人很好。' },
                 { word: 'wall', translation: '牆壁', sentence_en: 'The walls of this room are thin.', sentence_zh: '這個房間的牆很薄。' },
@@ -8335,7 +8335,7 @@ const baseWordLists = {
                 { word: 'above', translation: '在⋯上方；在上方', sentence_en: 'The clock is above the TV.', sentence_zh: '時鐘在電視上方。' },
                 { word: 'person', translation: '人', sentence_en: 'Jeremy is a nice person.', sentence_zh: 'Jeremy 是個好人。' }
             ],
-            Unit3: [
+            單元3: [
                 { word: 'guy', translation: '人；傢伙', sentence_en: 'Guys, don\'t run in the classroom.', sentence_zh: '各位同學，別在教室裡跑。' },
                 { word: 'with', translation: '和；與', sentence_en: 'She\'s in the car with Dad.', sentence_zh: '她和爸爸在車上。' },
                 { word: 'can', translation: '可以；會', sentence_en: 'We can\'t eat in the lab.', sentence_zh: '我們不能在實驗室吃東西。' },
@@ -8372,7 +8372,7 @@ const baseWordLists = {
                 { word: 'rule', translation: '規則', sentence_en: 'Don\'t use your phone in class. It\'s a classroom rule.', sentence_zh: '上課不要用手機。那是教室規則。' },
                 { word: 'safe', translation: '安全的', sentence_en: 'Do not run in the lab. That\'s not safe.', sentence_zh: '不要在實驗室裡跑步。那樣不安全。' }
             ],
-            Unit4: [
+            單元4: [
                 { word: 'music video', translation: '音樂影片', sentence_en: 'I am watching Mayday\'s new music video.', sentence_zh: '我正在看五月天的新音樂影片。' },
                 { word: 'band', translation: '樂團', sentence_en: 'My favorite band is singing on stage.', sentence_zh: '我最喜歡的樂團正在台上演唱。' },
                 { word: 'take a look', translation: '看一看', sentence_en: 'Come take a look.', sentence_zh: '過來看一看。' },
@@ -8407,7 +8407,7 @@ const baseWordLists = {
                 { word: 'everyone', translation: '每個人；大家', sentence_en: 'The drinks are not enough for everyone.', sentence_zh: '飲料不夠每個人喝。' },
                 { word: 'sign', translation: '簽名', sentence_en: 'Can you sign this picture for me?', sentence_zh: '可以幫我在這張照片上簽名嗎？' }
             ],
-            Unit5: [
+            單元5: [
                 { word: 'date', translation: '日期', sentence_en: 'The date of the concert is September twenty-first.', sentence_zh: '音樂會的日期是九月二十一日。' },
                 { word: 'November', translation: '十一月', sentence_en: 'Thanksgiving is in November.', sentence_zh: '感恩節在十一月。' },
                 { word: 'first', translation: '第一（的）', sentence_en: 'Sunday is the first day of the week.', sentence_zh: '星期天是一週的第一天。' },
@@ -8443,7 +8443,7 @@ const baseWordLists = {
                 { word: 'lucky', translation: '幸運的', sentence_en: 'Twelve is my lucky number.', sentence_zh: '十二是我的幸運數字。' },
                 { word: 'only', translation: '只是；唯一的', sentence_en: 'He is only a boy, not a man.', sentence_zh: '他只是個男孩，不是大人。' }
             ],
-            Unit6: [
+            單元6: [
                 { word: 'lion', translation: '獅子', sentence_en: 'Is there a lion under the tree?', sentence_zh: '樹下有獅子嗎？' },
                 { word: 'over there', translation: '在那裡', sentence_en: 'The woman over there is a cook.', sentence_zh: '那邊的那位女士是一位廚師。' },
                 { word: 'king', translation: '國王', sentence_en: 'The beautiful house is for the king.', sentence_zh: '那棟漂亮的房子是給國王的。' },
@@ -8515,4 +8515,5 @@ const baseWordLists = {
         rade_9A: {},
         grade_9B: {}
     }
+
 }; // 這是檔案的結尾

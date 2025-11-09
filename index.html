@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>英文單字卡</title>
     <style>
-        /* CSS 樣式 (大部分不變) */
+        /* CSS 樣式 */
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
@@ -28,6 +28,47 @@
             margin-bottom: 20px;
         }
 
+        /* --- *** 修正：伸縮說明區塊 *** --- */
+        .user-guide {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.7;
+            overflow: hidden; /* 確保圓角 */
+        }
+        
+        /* 說明的標題 (觸發器) */
+        .guide-trigger {
+            padding: 15px 20px;
+            margin: 0;
+            color: #007bff;
+            cursor: pointer;
+            font-size: 18px; /* 讓標題大一點 */
+        }
+        .guide-trigger:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* 說明的內容 (預設隱藏) */
+        .guide-content {
+            display: none; /* 預設隱藏 */
+            padding: 0px 20px 15px 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .guide-content h3 {
+            margin-top: 15px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .guide-content ul {
+            padding-left: 20px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+        /* --- (樣式結束) --- */
+
         .controls {
             text-align: center;
             margin-bottom: 20px;
@@ -42,7 +83,7 @@
             cursor: pointer;
             font-size: 16px;
             transition: background-color 0.3s;
-            margin: 0 5px; /* 增加按鈕間距 */
+            margin: 0 5px; 
         }
 
         button:hover {
@@ -54,25 +95,23 @@
             cursor: not-allowed;
         }
         
-        /* *** 新增：設定視窗內的按鈕樣式 *** */
         .modal-buttons {
             margin-top: 20px;
             text-align: right;
             display: flex;
-            justify-content: space-between; /* 讓按鈕分開 */
+            justify-content: space-between; 
         }
         
         .modal-buttons .btn-save {
-            background-color: #007bff; /* 儲存 (藍色) */
+            background-color: #007bff; 
         }
         .modal-buttons .btn-cancel {
-            background-color: #6c757d; /* 取消 (灰色) */
+            background-color: #6c757d; 
         }
         .modal-buttons .btn-restore {
-            background-color: #dc3545; /* 恢復預設 (紅色) */
-            margin-right: auto; /* 推到最左邊 */
+            background-color: #dc3545; 
+            margin-right: auto; 
         }
-        /* (樣式結束) */
 
 
         .navigation {
@@ -163,7 +202,7 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 16px;
-            box-sizing: border-box;
+            box-sizing: border-box; 
             text-align: center;
         }
 
@@ -248,7 +287,7 @@
         .stat-info {
             display: flex;
             justify-content: space-around;
-            flex-wrap: wrap;
+            flex-wrap: wrap; 
         }
 
         .stat-item {
@@ -267,12 +306,76 @@
             justify-content: center;
             margin-bottom: 10px;
         }
+        
+        /* RWD 響應式網頁設計 */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px; 
+            }
+
+            .container {
+                padding: 15px; 
+            }
+
+            h1 {
+                font-size: 28px; 
+            }
+            
+            /* 縮小說明標題 */
+            .guide-trigger {
+                font-size: 16px;
+                padding: 12px 15px;
+            }
+
+            .word-display {
+                font-size: 28px; 
+            }
+
+            button, .btn {
+                padding: 10px 15px; 
+                font-size: 15px;
+            }
+
+            .controls button {
+                margin-top: 5px;
+                margin-bottom: 5px;
+            }
+
+            .stat-info {
+                flex-direction: column;
+                gap: 10px; 
+            }
+        }
+        
     </style>
 </head>
 <body>
     <div class="container">
         <h1>英文單字卡</h1>
 
+        <div class="user-guide">
+            <h3 class="guide-trigger" onclick="toggleGuide()">
+                📖 使用說明 (點此展開/收合)
+            </h3>
+            
+            <div class="guide-content" id="guideContent">
+                <h3>使用步驟</h3>
+                <ul>
+                    <li><strong>聆聽發音：</strong>點擊「美式發音」或「英式發音」按鈕，聽單字怎麼唸。</li>
+                    <li><strong>輸入單字：</strong>在輸入框中，拼出您聽到的單字 (大小寫皆可)。</li>
+                    <li><strong>檢查答案：</strong>按下「檢查」按鈕 (或直接按鍵盤的 Enter 鍵)。</li>
+                    <li><strong>查看結果：</strong>程式會顯示「正確」或「錯誤」，並提供中文翻譯、例句和例句發音 (🔊)。</li>
+                    <li><strong>繼續測驗：</strong>點擊「上一張」或「下一張」來切換題目。</li>
+                </ul>
+                <h3>⚠️ 注意事項</h3>
+                <ul>
+                    <li><strong>隨機抽題：</strong>每次測驗都是從 150+ 題庫中**隨機抽取 100 題**。重整網頁會重新抽題。</li>
+                    <li><strong>自訂單字：</strong>您可以點擊「設定單字」來使用您自己的單字列表 (儲存後會覆蓋預設題庫)。</li>
+                    <li><strong>恢復預設：</strong>在「設定單字」視窗中，可按「恢復預設題庫」來清除您的自訂內容，恢復隨機抽題。</li>
+                    <li><strong>發音功能：</strong>發音由您的瀏覽器 (如 Chrome) 提供，請確保瀏覽器為最新版本。</li>
+                </ul>
+            </div>
+        </div>
         <div class="controls">
             <button onclick="openWordSettings()">設定單字</button>
             <button onclick="shuffleAndReset()">重新排序 (100題)</button>
@@ -490,24 +593,19 @@
         let results = {}; 
         let currentIndex = 0;
 
-        // ** 這是完整的題庫 (baseWords) **
-        // 我們用 'const' 來宣告，防止它被意外修改
+        // 這是完整的預設題庫 (baseWords)
         const baseWords = [...words];
 
         // 簡化 init() 函式
         function init() {
-            // 檢查是否有儲存的自訂單字
             if (localStorage.getItem('customWords')) {
                 const storedWords = JSON.parse(localStorage.getItem('customWords'));
                 if (storedWords.length > 0) {
-                    // 如果有自訂單字，'words' 變數就使用自訂的
                     words = storedWords; 
                 } else {
-                    // 如果存了個空的，就還是用預設的
                     words = [...baseWords];
                 }
             } else {
-                // 預設情況下，'words' 變數使用完整題庫
                 words = [...baseWords];
             }
             
@@ -518,15 +616,11 @@
 
         // 100 題抽題邏輯
         function shuffleAndReset() {
-            // 1. 永遠從 'words' 變數 (可能是預設題庫，也可能是自訂題庫) 來洗牌
             let shuffledFullList = [...words].sort(() => Math.random() - 0.5);
             
-            // 2. 判斷單字庫是否超過 100
             if (shuffledFullList.length > 100) {
-                // 3. 如果超過，只取前 100 個
                 shuffleWords = shuffledFullList.slice(0, 100);
             } else {
-                // 4. 如果沒有，就用全部
                 shuffleWords = shuffledFullList;
             }
 
@@ -721,11 +815,15 @@
         // 發音功能 (現在也用於例句)
         function speakWord(word, lang = "en-US") {
             if ('speechSynthesis' in window) {
+                // 停止上次的發音，防止重疊
+                window.speechSynthesis.cancel(); 
+
                 const utterance = new SpeechSynthesisUtterance(word);
                 utterance.lang = lang;
                 utterance.rate = 0.8;
                 utterance.volume = 1;
                 window.speechSynthesis.speak(utterance);
+                
                 setTimeout(() => {
                     const inputElement = document.getElementById('currentInput');
                     if (inputElement && !inputElement.disabled) { 
@@ -825,7 +923,7 @@
             const modal = document.getElementById('wordSettingsModal');
             modal.style.display = 'flex'; 
             
-            // 顯示當前使用的單字 (可能是預設的，也可能是自訂的)
+            // 顯示當前使用的單字
             document.getElementById('customWordsTextarea').value = words.map(w => w.word).join('\n');
             document.getElementById('customWordsTextarea').focus();
         }
@@ -853,14 +951,14 @@
                 sentence_zh: '（無例句）'
             }));
 
-            words = newWordsObjects; // 將 'words' 變數設為自訂單字
+            words = newWordsObjects; 
             localStorage.setItem('customWords', JSON.stringify(newWordsObjects));
             
             shuffleAndReset(); 
             closeWordSettings(); 
         }
 
-        // *** 修正點 2：新增「恢復預設」的函式 ***
+        // 新增：「恢復預設」的函式
         function restoreDefaultWords() {
             if (confirm("您確定要清除所有自訂單字，並恢復為 150+ 預設題庫嗎？")) {
                 localStorage.removeItem('customWords'); // 清除儲存的自訂單字
@@ -869,6 +967,15 @@
             }
         }
 
+        // --- *** 新增：控制說明區塊的 JS *** ---
+        function toggleGuide() {
+            const content = document.getElementById('guideContent');
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+            } else {
+                content.style.display = 'block';
+            }
+        }
 
         // 頁面載入時初始化
         window.onload = init;

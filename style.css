@@ -1,6 +1,50 @@
-/* 這是 'style.css' 檔案 (v19 - 完整遊戲化版 + 自訂題數按鈕) */
+/* 這是 'style.css' 檔案 (v22 - 完整遊戲化版 + 紀錄按鈕佈局調整) */
 
 /* --- 基本樣式 --- */
+/* --- [新增] 頂部 Google 登入 --- */
+.auth-container {
+    display: flex;
+    justify-content: flex-end; /* 靠右對齊 */
+    align-items: center;
+    gap: 10px; /* 按鈕和文字間的距離 */
+    margin-bottom: 15px; /* 和下方標題的距離 */
+}
+
+/* 登入和登出按鈕的統一樣式 */
+#authButton, #signOutButton, #fbButton {
+    display: inline-flex; /* 讓圖片和文字對齊 */
+    align-items: center;
+    gap: 8px; /* 圖片和文字的間距 */
+    
+    /* 調整按鈕大小和外觀 */
+    font-size: 14px;
+    padding: 6px 12px; 
+    background-color: #f8f9fa; /* 給個背景色 */
+    border: 1px solid #dee2e6; /* 加個邊框 */
+    color: #333;
+    /* 繼承通用按鈕樣式 */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+#authButton:hover, #signOutButton:hover, #fbButton:hover {
+     background-color: #e9ecef;
+}
+
+
+/* 關鍵：縮小 Google Logo 圖片 */
+#authButton img {
+    height: 18px; 
+    width: 18px;
+}
+
+/* 歡迎訊息 */
+#userInfo {
+    font-size: 14px;
+    color: #555;
+    font-weight: bold;
+}
+
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
@@ -211,7 +255,9 @@ h1 {
     color: #007bff;
     cursor: pointer;
     font-size: 18px; 
+    text-align: center; 
 }
+
 .guide-trigger:hover {
     background-color: #f1f1f1;
 }
@@ -236,7 +282,6 @@ h1 {
 .controls {
     text-align: center;
     margin-bottom: 20px;
-    /* [修改] 讓題數輸入框可以換行 */
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -255,7 +300,7 @@ button {
     transition: background-color 0.3s;
 }
 
-/* [修改] 只針對 controls 的 "直接子項" 按鈕 */
+/* 只針對 controls 的 "直接子項" 按鈕 */
 .controls > button {
     margin: 0; 
 }
@@ -269,7 +314,10 @@ button:disabled {
     cursor: not-allowed;
 }
 
-/* [修改] 測驗題數輸入框樣式 (加入按鈕) */
+/* [修改] 移除匯出/匯入按鈕的舊樣式 */
+
+
+/* 測驗題數輸入框樣式 (加入按鈕) */
 .quiz-length-control {
     display: flex;
     align-items: center;
@@ -296,7 +344,6 @@ button:disabled {
     border-radius: 4px;
     text-align: center;
 }
-/* [新增] 題數確定按鈕 */
 .btn-update-length {
     padding: 6px 12px; /* 配合 input 高度 */
     font-size: 14px;
@@ -599,7 +646,7 @@ button:disabled {
     
     .level-tab {
         font-size: 11px;
-        flex-basis: 15%; 
+        flex-basis: calc(33.33% - 4px);
     }
     
     .guide-trigger {
@@ -616,27 +663,26 @@ button:disabled {
         font-size: 15px;
     }
 
-    /* [修改] RWD 按鈕控制 */
+    /* [修改 v22] RWD 按鈕控制 (移除匯出/匯入) */
     .controls {
-        gap: 8px; /* 手機上按鈕間距小一點 */
+        gap: 8px; 
     }
-    /* [修改] 使用 > 確保只選到直接子項 */
     .controls > button {
         flex-grow: 1;
-        flex-basis: 100%; /* "設定單字" 佔 100% */
+        flex-basis: 100%; 
     }
-    /* [新增] 讓 "排序" 和 "重置" 兩個按鈕並排 */
     .controls > #shuffleButton,
     .controls > button[onclick="resetAll()"] {
-        flex-basis: 40%; /* (flex-grow 會自動讓它們填滿 50%) */
+        flex-basis: 40%; 
+        font-size: 14px; 
+        padding: 10px 12px;
     }
     
     .controls .quiz-length-control {
-        flex-basis: 100%; /* 題數控制單獨佔一行 */
+        flex-basis: 100%; 
         margin-top: 0;
-        padding: 8px; /* 手機上內距小一點 */
+        padding: 8px; 
     }
-    /* [新增] RWD 題數按鈕 */
     .btn-update-length {
         padding: 6px 10px;
         font-size: 13px;
@@ -689,24 +735,24 @@ button:disabled {
 }
 
 
-/* --- [新增] 遊戲化樣式 (v17 - 佈局重構 + 造景) --- */
+/* --- [修改] 遊戲化樣式 (v22 - 佈局重構 + 紀錄按鈕) --- */
 
 /* 1. 遊戲化區塊總容器 */
 .gamification-wrapper {
     display: flex;
-    flex-wrap: wrap; /* 手機上會自動換行 */
+    flex-wrap: wrap; 
     gap: 15px;
     margin-bottom: 20px;
 }
 
 /* 2. 寵物養成區塊 */
 .pet-container {
-    flex: 1; /* 佔據主要空間 */
-    min-width: 250px; /* 最小寬度 */
+    flex: 1; 
+    min-width: 250px; 
     background-color: #f8f9fa;
     border: 1px solid #dee2e6;
     border-radius: 8px;
-    overflow: hidden; /* 確保圓角效果 */
+    overflow: hidden; 
 }
 
 .pet-header {
@@ -724,24 +770,21 @@ button:disabled {
     padding: 15px;
 }
 
-/* [修改] 寵物的小框框 (加入造景) */
 .pet-image-frame {
-    width: 70px; /* 稍微加大 */
+    width: 70px; 
     height: 70px;
-    /* [新] 使用漸層當作天空背景 */
-    background: linear-gradient(to top, #c1e1c1 20%, #bde0fe 60%); /* 底部草地漸層到天空藍 */
-    border: 3px solid #8B4513; /* 咖啡色木頭邊框 */
-    border-radius: 12px; /* 圓角 */
+    background: linear-gradient(to top, #c1e1c1 20%, #bde0fe 60%); 
+    border: 3px solid #8B4513; 
+    border-radius: 12px; 
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right: 15px;
     flex-shrink: 0;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1); /* 外框陰影 */
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1); 
     position: relative;
-    overflow: hidden; /* 隱藏 emoji 溢出的陰影 */
+    overflow: hidden; 
 }
-/* [新增] 寵物底下的草地 */
 .pet-image-frame::after {
     content: '🌱';
     position: absolute;
@@ -756,12 +799,12 @@ button:disabled {
     line-height: 1;
     animation: bounce 2s infinite ease-in-out;
     filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
-    z-index: 2; /* 確保寵物在草地前面 */
-    margin-bottom: -5px; /* 讓寵物看起來像站在草地上 */
+    z-index: 2; 
+    margin-bottom: -5px; 
 }
 .pet-info {
     flex-grow: 1;
-    width: calc(100% - 85px); /* 減去框框的寬度和 margin */
+    width: calc(100% - 85px); 
 }
 .pet-name {
     font-size: 18px;
@@ -779,7 +822,7 @@ button:disabled {
 .xp-bar-fill {
     height: 100%;
     width: 0%; /* 會由 JS 控制 */
-    background: linear-gradient(90deg, #28a745, #84e18d); /* 漸層綠色 */
+    background: linear-gradient(90deg, #28a745, #84e18d); 
     border-radius: 5px;
     transition: width 0.5s ease;
 }
@@ -788,7 +831,6 @@ button:disabled {
     color: #6c757d;
 }
 
-/* 寵物跳動動畫 */
 @keyframes bounce {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-4px); }
@@ -797,8 +839,8 @@ button:disabled {
 /* 3. 成就徽章區塊 */
 .badge-container {
     flex: 1;
-    min-width: 150px; /* 最小寬度 */
-    background-color: #fff8e1; /* 淺黃色底 */
+    min-width: 150px; 
+    background-color: #fff8e1; 
     border: 1px solid #ffeeba;
     border-radius: 8px;
     padding: 10px 15px;
@@ -810,8 +852,9 @@ button:disabled {
 .badge-header {
     font-size: 16px;
     font-weight: bold;
-    color: #856404; /* 深黃色文字 */
+    color: #856404; 
     margin-bottom: 10px;
+    text-align: center; 
 }
 .badge-button {
     background-color: #ffc107;
@@ -830,6 +873,33 @@ button:disabled {
     background-color: #e0a800;
 }
 
+/* [新增 v22] 匯出/匯入按鈕群組 */
+.data-buttons-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px; /* 和上方按鈕間隔 */
+    width: 100%;
+}
+.data-buttons-group .btn-export,
+.data-buttons-group .btn-import {
+    flex: 1; /* 讓兩個按鈕平分寬度 */
+    font-size: 13px;
+    padding: 8px 10px;
+    margin: 0; /* 覆蓋 .controls button 的 margin */
+}
+.data-buttons-group .btn-export {
+    background-color: #28a745;
+}
+.data-buttons-group .btn-export:hover {
+    background-color: #218838;
+}
+.data-buttons-group .btn-import {
+    background-color: #fd7e14;
+}
+.data-buttons-group .btn-import:hover {
+    background-color: #e36a00;
+}
+
 
 /* 4. 連擊 (Combo) 提示 */
 .combo-streak {
@@ -840,7 +910,7 @@ button:disabled {
 }
 
 @keyframes pop {
-    0% { transform: scale(1); }
+    0%, 100% { transform: scale(1); }
     50% { transform: scale(1.2); }
     100% { transform: scale(1); }
 }
@@ -925,4 +995,34 @@ button:disabled {
     .badge-button {
         padding: 10px 15px;
     }
+}
+
+/* 寵物進化特效 */
+.pet-image-frame.evolve {
+    /* 播放一個 0.8 秒的閃光動畫 */
+    animation: evolve-flash 0.8s ease-in-out;
+}
+
+@keyframes evolve-flash {
+    0%, 100% { transform: scale(1); box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
+    50% { transform: scale(1.15); box-shadow: 0 0 25px #ffc107; background-color: #fff8e1; }
+    100% { transform: scale(1); box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
+}
+/* --- [新增] Facebook 登入按鈕專屬樣式 --- */
+
+/* Facebook 藍色背景 */
+#fbButton {
+    background-color: #1877F2;
+    color: white;
+    border-color: #1877F2;
+}
+#fbButton:hover {
+    background-color: #166fe5; /* 滑過時的深藍色 */
+}
+
+/* 讓 Facebook Logo 圖片在藍色背景上顯示為白色 */
+#fbButton img {
+    height: 18px; 
+    width: 18px;
+    filter: brightness(0) invert(1); /* 關鍵：讓圖片反白 */
 }

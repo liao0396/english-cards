@@ -4,6 +4,7 @@ const baseWordLists = {
     level1_element: [
         { word: 'apple', translation: '蘋果', sentence_en: 'An apple a day keeps the doctor away.', sentence_zh: '一天一蘋果，醫生遠離我。' },
         { word: 'ant', translation: '螞蟻', sentence_en: 'An ant is a very small insect.', sentence_zh: '螞蟻是一種非常小的昆蟲。' },
+        { word: 'ax', translation: '斧頭', sentence_en: 'He used an ax to chop the wood.', sentence_zh: '他用一把斧頭砍柴。' },
         { word: 'arm', translation: '手臂', sentence_en: 'He broke his arm playing basketball.', sentence_zh: '他打籃球時摔斷了手臂。' },
         { word: 'baby', translation: '嬰兒', sentence_en: 'The baby is sleeping.', sentence_zh: '寶寶正在睡覺。' },
         { word: 'bag', translation: '袋子', sentence_en: 'My bag is heavy.', sentence_zh: '我的袋子很重。' },
@@ -8517,3 +8518,4 @@ const baseWordLists = {
     }
 
 }; // 這是檔案的結尾
+

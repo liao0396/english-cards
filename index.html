@@ -16,11 +16,11 @@
             <h1>英文單字卡</h1>
             
             <div class="level-tabs" id="mainTabs">
-                <button class="level-tab" id="tab-level1_element" onclick="changeLevel('level1_element')">國小(6歲-12歲)</button>
-                <button class="level-tab" id="tab-level2_junior" onclick="changeLevel('level2_junior')">國中(13歲-15歲)</button>
-                <button class="level-tab" id="tab-level3_senior" onclick="changeLevel('level3_senior')">高中(16歲-18歲)</button>
-                <button class="level-tab" id="tab-level4_college" onclick="changeLevel('level4_college')">大學(19歲-22歲)</button>
-                <button class="level-tab" id="tab-level5_business" onclick="changeLevel('level5_business')">商務(22歲+)</button>
+                <button class="level-tab" id="tab-level1_element" onclick="changeLevel('level1_element')">國小</button>
+                <button class="level-tab" id="tab-level2_junior" onclick="changeLevel('level2_junior')">國中</button>
+                <button class="level-tab" id="tab-level3_senior" onclick="changeLevel('level3_senior')">高中</button>
+                <button class="level-tab" id="tab-level4_college" onclick="changeLevel('level4_college')">大學</button>
+                <button class="level-tab" id="tab-level5_business" onclick="changeLevel('level5_business')">商務</button>
                 <button class="level-tab" id="tab-level6_hanlin" onclick="showHanlinPanel()">📘翰林專區</button>
                 <button class="level-tab" id="tab-custom" onclick="changeLevel('custom')">自訂題庫</button>
             </div>
@@ -69,11 +69,21 @@
                     <li>(答案顯示後) 點擊「🔊」聆聽例句發音。</li>
                     <li>點擊「下一張」進行下個測驗。</li>
                 </ol>
+
+                <h3>🎮 遊戲化功能</h3>
+                <p>為了讓學習更有趣，我們加入了新功能：</p>
+                <ul>
+                    <li><strong>寵物養成：</strong>每次答對單字都能獲得 XP 經驗值。XP 累積到一定程度，您的寵物（位於單字卡上方）將會進化成新的型態！</li>
+                    <li><strong>連擊獎勵：</strong>連續答對單字，您會看到「🔥 連擊」提示，並獲得額外的 XP 獎勵！</li>
+                    <li><strong>成就徽章：</strong>達成特定目標（例如累積答對100題、完成翰林專區測驗等），就能解鎖「我的成就」中的徽章，快來收集全部吧！</li>
+                </ul>
+
                 <h3>⚠️ 注意事項</h3>
                 <ul>
                     <li><strong>題庫切換：</strong>請先在最上方選擇您要練習的等級（國小、國中等），或進入**「翰林專區」**選擇教材進度。</li>
-                    <li><strong>題庫範圍：</strong>「國小」題庫包含 500+ 單字；「國中」、「高中」、「大學」、「商務」皆已擴充至 1000+ 單字。</li>
-                    <li><strong>隨機抽題：</strong>測驗數量將根據您**所選單元的單字總數**與 100 題取較小值。</li>
+                    <li><strong>題庫範圍：</strong>「國小」、「國中」、「高中」、「大學」、「商務」題庫皆已擴充至 1000+ 單字。</li>
+                    <li><strong>測驗題數：</strong>您可以在「重置進度」按鈕下方**自行輸入**每次測驗要抽幾題（最少10題）。</li>
+                    <li><strong>紀錄儲存：</strong>您的寵物、XP、徽章等紀錄，皆儲存在**本機瀏覽器**中。若清除瀏覽器快取或更換電腦，遊戲進度將會重設。</li>
                     <li><strong>自訂單字：</strong>您可以點擊「設定單字」來編輯「自訂題庫」的內容。</li>
                     <li><strong>恢復預設：</strong>在「設定單字」視窗中，可按「恢復預設題庫」來清除您的自訂內容，並切換回「國小」題庫。</li>
                 </ul>
@@ -85,6 +95,12 @@
             <button onclick="openWordSettings()">設定單字</button>
             <button id="shuffleButton" onclick="shuffleAndReset()">重新排序 (100題)</button>
             <button onclick="resetAll()">重置進度</button>
+            
+            <div class="quiz-length-control">
+                <label for="quizLengthInput">測驗題數：</label>
+                <input type="number" id="quizLengthInput" value="100" min="10" onchange="updateQuizLength()">
+                <button class="btn-update-length" onclick="updateQuizLength()">確定</button>
+            </div>
         </div>
 
         
@@ -94,6 +110,32 @@
             <button class="nav-btn" id="nextBtn" onclick="nextCard()">下一張</button>
         </div>
 
+        <div class="gamification-wrapper">
+            
+            <div class="pet-container">
+                <div class="pet-header">我的寵物</div>
+                <div class="pet-content">
+                    <div class="pet-image-frame"> <div class="pet-image" id="petImage">🥚</div>
+                    </div>
+                    <div class="pet-info">
+                        <div class="pet-name" id="petName">學習新星</div>
+                        <div class="xp-bar">
+                            <div class="xp-bar-fill" id="xpBarFill"></div>
+                        </div>
+                        <div class="xp-text" id="xpText">XP: 0 / 100</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="badge-container">
+                <div class="badge-header">我的成就</div>
+                <button class="badge-button" onclick="openBadgeModal()">
+                    <span class="badge-button-icon">🎖️</span>
+                    <span class="badge-button-text">查看徽章</span>
+                </button>
+            </div>
+
+        </div>
         <div class="word-card" id="wordCard">
             </div>
 
@@ -125,28 +167,49 @@
 
         <div id="wordSettingsModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:999; align-items:center; justify-content:center;">
             <div style="background:#fff; border-radius:8px; padding:20px; max-width:90vw; width:600px; box-shadow:0 2px 5px rgba(0,0,0,0.2); position:relative;">
-<h2 style="margin-top:0;">設定「自訂題庫」</h2>
-
-<p>請輸入單字，格式為 (分號分隔)：<br><b>英文單字;英文例句;中文例句</b></p>
-<textarea id="customWordsTextarea" style="width:100%; height:250px; border-radius:5px; border:1px solid #ccc; padding:10px; box-sizing:border-box;" 
-    placeholder="例如 (可自訂例句)：
+                <h2 style="margin-top:0;">設定「自訂題庫」</h2>
+                
+                <p>請輸入單字，格式為 (分號分隔)：<br><b>英文單字;英文例句;中文例句</b></p>
+                <textarea id="customWordsTextarea" style="width:100%; height:250px; border-radius:5px; border:1px solid #ccc; padding:10px; box-sizing:border-box;" 
+                    placeholder="例如 (可自訂例句)：
 apple;I like to eat apples.;我喜歡吃蘋果。
 
 (若省略例句，系統會自動搜尋題庫)
 book
 pen
 
-(若題庫找不到，翻譯會自動翻譯單字)
+(若題庫找不到，翻譯會自動抓 API)
 photosynthesis
 "></textarea>
-<div class="modal-buttons">
-    <button class="btn-restore" onclick="restoreDefaultWords()">恢復預設題庫</button>                    <div>
+                
+                <div class="modal-buttons">
+                    <button class="btn-restore" onclick="restoreDefaultWords()">恢復預設題庫</button>
+                    <div>
                         <button class="btn-cancel" onclick="closeWordSettings()">取消</button>
                         <button class="btn-save" onclick="saveWordSettings()">儲存</button>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <div id="badgeModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:999; align-items:center; justify-content:center;">
+            <div style="background:#fff; border-radius:8px; padding:20px; max-width:90vw; width:600px; box-shadow:0 2px 5px rgba(0,0,0,0.2); position:relative;">
+                <h2 style="margin-top:0;">🎖️ 我的成就徽章</h2>
+                <p>不斷學習來解鎖所有徽章！</p>
+                
+                <div class="badge-grid" id="badgeGrid">
+                    <div class="badge-item badge-locked">
+                        <div class="badge-icon">❓</div>
+                        <div class="badge-title">？？？</div>
+                    </div>
+                </div>
+                
+                <div class="modal-buttons" style="justify-content: flex-end;">
+                    <button class="btn-cancel" onclick="closeBadgeModal()">關閉</button>
+                </div>
+            </div>
+        </div>
+        
     </div> <script src="script.js"></script>
 </body>
 </html>

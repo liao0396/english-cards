@@ -1,5 +1,5 @@
 // 這是 'script.js' 檔案
-// [最終整合版] v13 - 包含自訂題庫(自動翻譯 + 自動搜尋翻譯/例句 + 手動輸入例句)
+// [最終遊戲化整合版] v21 - (v20 擴充 + v19.1 Bug修復 + 10題無上限)
 
 // 'words' 變數 - 用來存放 "目前" 正在練習的題庫 (已合併單元)
 let words = []; 
@@ -9,6 +9,53 @@ let results = {};
 let currentIndex = 0;
 let currentLevel = 'level1_element'; // 預設等級 (國小)
 let currentHanlinGrade = ''; // 紀錄當前選擇的翰林年級 (例如 grade_7A)
+
+// --- [新增] 遊戲化全域變數 ---
+let totalXP = 0;
+let currentStreak = 0;
+let unlockedBadges = [];
+let quizLengthLimit = 100; // [新增] 測驗題數上限
+
+// [修改 v20] 寵物進化設定 (擴充至 10 級)
+const petLevels = [
+    { xp: 0,    name: '學習新星', image: '🥚' },
+    { xp: 100,  name: '見習學徒', image: '🐣' },
+    { xp: 500,  name: '小小探險家', image: '🦖' },
+    { xp: 1500, name: '單字獵人', image: '🦕' },
+    { xp: 3000, name: '翰林學者', image: '🐉' },
+    { xp: 6000, name: '單字大師', image: '👑🐉' },
+    { xp: 10000,name: '烈焰巨龍', image: '🔥🐉' },
+    { xp: 18000,name: '寒冰巨龍', image: '🧊🐉' },
+    { xp: 30000,name: '雷霆聖龍', image: '⚡🐉' },
+    { xp: 50000,name: '單字之神', image: '✨🐉' }
+];
+
+// [修改 v20] 徽章成就設定 (擴充至 15 個)
+const allBadges = {
+    // 累積徽章
+    'first_correct': { icon: '✅', title: '踏出第一步', desc: '第一次答對單字' },
+    'correct_10': { icon: '🔟', title: '小小成就', desc: '累積答對 10 題' },
+    'correct_50': { icon: '5️⃣0️⃣', title: '穩定進步', desc: '累積答對 50 題' },
+    'correct_100': { icon: '💯', title: '百詞斬', desc: '累積答對 100 題' },
+    'correct_500': { icon: '5️⃣0️⃣0️⃣', title: '詞彙忍者', desc: '累積答對 500 題' },
+    'correct_1000': { icon: '🏆', title: '千詞達人', desc: '累積答對 1000 題' },
+    
+    // 連擊徽章
+    'streak_5': { icon: '🔥', title: '連擊好手', desc: '連續答對 5 題' },
+    'streak_10': { icon: '💥', title: '火力全開', desc: '連續答對 10 題' },
+    'streak_25': { icon: '🚀', title: '勢不可擋', desc: '連續答對 25 題' },
+
+    // 技巧徽章
+    'perfect_quiz': { icon: '🎯', title: '完美測驗', desc: '在一次測驗中 (至少20題) 達到 100% 答對率' },
+    'perfect_100': { icon: '💎', title: '完美無瑕', desc: '在 100 題的測驗中達到 100% 答對率' },
+
+    // 探索徽章
+    'custom_user': { icon: '✏️', title: '自造者', desc: '完成一次自訂題庫測驗' },
+    'hanlin_user': { icon: '📘', title: '翰林學霸', desc: '完成一次翰林專區測驗' },
+    'junior_pass': { icon: '🧑‍🎓', title: '國中畢業', desc: '完成一次國中等級測驗' },
+    'senior_pass': { icon: '🏛️', title: '高中畢業', desc: '完成一次高中等級測驗' }
+};
+// --- (遊戲化變數結束) ---
 
 // 'baseWordLists' 變數將由 <script src="words.js"></script> 檔案提供。
 
@@ -22,26 +69,37 @@ function init() {
         return;
     }
 
+    // 載入遊戲化資料
+    totalXP = parseInt(localStorage.getItem('totalXP') || '0', 10);
+    unlockedBadges = JSON.parse(localStorage.getItem('unlockedBadges') || '[]');
+    
+    // [修改 v21] 載入自訂題數 (預設 100)
+    quizLengthLimit = parseInt(localStorage.getItem('quizLengthLimit') || '100', 10);
+    document.getElementById('quizLengthInput').value = quizLengthLimit;
+
+
     // 讀取上次儲存的等級，如果沒有，就用預設的 'level1_element'
     currentLevel = localStorage.getItem('currentWordLevel') || 'level1_element';
     
-    // 載入對應的單字列表
-    if (currentLevel.startsWith('grade_')) {
-        currentHanlinGrade = currentLevel; // 記錄下來
-        // 嘗試從 grade_7A 預載入單字數給介面顯示
-        if (baseWordLists.level6_hanlin[currentHanlinGrade] && baseWordLists.level6_hanlin[currentHanlinGrade].Unit1) {
-            words = baseWordLists.level6_hanlin[currentHanlinGrade].Unit1; 
-        }
-    } else {
-        loadWordList(currentLevel);
+    // [BUG 修復 v19.1]
+    // 檢查儲存的等級是否為 'level6_hanlin' (翰林主面板) 或 'grade_' (翰林子選單)
+    // 這些狀態在重新載入時無法直接載入題庫，會導致錯誤
+    if (currentLevel === 'level6_hanlin' || currentLevel.startsWith('grade_')) {
+        // 強制重設回 level1，讓使用者有一個安全的啟動狀態
+        currentLevel = 'level1_element';
+        localStorage.setItem('currentWordLevel', 'level1_element');
     }
+
+    // 載入對應的單字列表 (此時 currentLevel 一定是 level1-5 或 custom)
+    loadWordList(currentLevel);
     
     // 更新介面
     updateActiveTab(currentLevel);
-    shuffleAndReset(); 
+    shuffleAndReset(); // 這裡會重設 streak
     updateStats();
     updateNavigation();
     updateControlsText(); // 初始化按鈕文字
+    updatePetDisplay(); // [新增] 初始化寵物介面
 }
 
 /**
@@ -113,7 +171,7 @@ function showHanlinPanel() {
     document.getElementById('mainTabs').style.display = 'none';
     document.getElementById('hanlinPanel').style.display = 'block';
     updateActiveTab('tab-level6_hanlin');
-    
+
     // 預設顯示七年級上學期的單元
     if (!currentHanlinGrade || !currentHanlinGrade.startsWith('grade_')) {
         currentHanlinGrade = 'grade_7A';
@@ -271,9 +329,34 @@ function updateActiveTab(activeLevelId = currentLevel) {
 }
 
 /**
+ * [新增] 更新自訂題數
+ */
+function updateQuizLength() {
+    const input = document.getElementById('quizLengthInput');
+    let length = parseInt(input.value, 10);
+
+    // [修改 v21] 驗證輸入，最小值為 10，移除上限
+    if (isNaN(length) || length < 10) {
+        length = 10;
+        alert("測驗題數最少為 10 題。");
+    }
+    
+    input.value = length; // 校正輸入框中的值
+    quizLengthLimit = length;
+    localStorage.setItem('quizLengthLimit', length);
+    
+    // 立即更新按鈕文字，並重新抽題
+    updateControlsText();
+    shuffleAndReset();
+}
+
+/**
  * 根據當前題庫總數更新按鈕文字 
  */
 function updateControlsText() {
+    // [修改] 讀取 quizLengthLimit
+    const currentQuizLimit = quizLengthLimit;
+
     // 處理 Unit Selection 介面
     const startQuizBtn = document.querySelector('.btn-start-quiz');
     if (startQuizBtn && document.getElementById('hanlinPanel').style.display === 'block' && currentHanlinGrade) {
@@ -293,14 +376,15 @@ function updateControlsText() {
         }
 
         const selectedWordsCount = combinedWords.length;
-        const quizLimitHanlin = Math.min(selectedWordsCount, 100);
+        // [修改] 翰林專區的測驗題數也使用自訂上限
+        const quizLimitHanlin = Math.min(selectedWordsCount, currentQuizLimit);
 
         if (selectedWordsCount === 0) {
              startQuizBtn.textContent = '開始測驗';
-        } else if (selectedWordsCount <= 100) {
+        } else if (selectedWordsCount <= currentQuizLimit) {
              startQuizBtn.textContent = `開始測驗 (共 ${quizLimitHanlin} 題)`;
         } else {
-             startQuizBtn.textContent = `開始測驗 (抽取 100 題)`;
+             startQuizBtn.textContent = `開始測驗 (抽取 ${currentQuizLimit} 題)`;
         }
     }
 
@@ -308,36 +392,38 @@ function updateControlsText() {
     // 處理「重新排序」按鈕
     const shuffleBtn = document.getElementById('shuffleButton'); 
     const totalWordsCount = words.length;
-    const quizLimit = Math.min(totalWordsCount, 100);
+    // [修改] 一般等級的測驗題數也使用自訂上限
+    const quizLimit = Math.min(totalWordsCount, currentQuizLimit);
 
     if (totalWordsCount === 0) {
         shuffleBtn.textContent = '重新排序 (題庫為空)';
-    } else if (totalWordsCount <= 100) {
+    } else if (totalWordsCount <= currentQuizLimit) {
         shuffleBtn.textContent = `重新排序 (共 ${quizLimit} 題)`;
     } else {
-        shuffleBtn.textContent = `重新排序 (抽取 100 題)`;
+        shuffleBtn.textContent = `重新排序 (抽取 ${currentQuizLimit} 題)`;
     }
 }
 
 
-// 100 題抽題邏輯
+// [修改] 抽題邏輯
 function shuffleAndReset() {
     if (!words || words.length === 0) {
         shuffleWords = []; 
     } else {
         let shuffledFullList = [...words].sort(() => Math.random() - 0.5);
         
-        // 動態設定測驗數量 (核心修復點)
-        const quizLimit = Math.min(shuffledFullList.length, 100);
+        // [重大修改] 動態設定測驗數量 (使用 quizLengthLimit)
+        const quizLimit = Math.min(shuffledFullList.length, quizLengthLimit);
         shuffleWords = shuffledFullList.slice(0, quizLimit);
     }
 
     results = {}; 
     currentIndex = 0;
+    currentStreak = 0; // [新增] 重設連擊
     generateCurrentCard();
     updateNavigation();
     updateStats();
-    updateControlsText(); 
+    updateControlsText(); // [新增] 更新按鈕文字
 }
 
 // 生成卡片
@@ -652,10 +738,25 @@ function checkCurrentWord(wordObject) {
     results[index] = isCorrect; 
 
     if (isCorrect) {
-        resultEl.innerHTML = '正確！';
+        // [新增] 連擊和 XP 邏輯
+        currentStreak++;
+        let xpGained = 10 + Math.min(currentStreak, 5); // 基礎 10 XP，連擊最多額外+5 XP
+        addXP(xpGained);
+
+        let comboText = '';
+        if (currentStreak > 1) {
+            comboText = `<span class="combo-streak">🔥 連續答對 ${currentStreak} 題！(+${xpGained} XP)</span>`;
+        } else {
+            comboText = ` (+${xpGained} XP)`;
+        }
+
+        resultEl.innerHTML = '正確！' + comboText;
         resultEl.className = 'result correct';
         wordCard.className = 'word-card correct';
+        
     } else {
+        // [新增] 中斷連擊
+        currentStreak = 0;
         resultEl.innerHTML = `錯誤！正確答案是 ${correctWord}`;
         resultEl.className = 'result incorrect';
         wordCard.className = 'word-card incorrect';
@@ -705,7 +806,7 @@ function checkCurrentWord(wordObject) {
     input.disabled = true;
     document.querySelector('#wordCard .check-btn').disabled = true;
 
-    const stats = updateStats(); // 更新統計並取得回傳值
+    const stats = updateStats(); // 更新統計並取得回傳值 (這裡會觸發徽章檢查)
 
     // 將提示 ⑤ 附加到「下一張」按鈕上
     addStepMarker(document.getElementById('nextBtn'), '⑤', 'step-marker-5');
@@ -729,6 +830,7 @@ function handleEnterKey(event, wordObject) {
 function resetAll() {
     results = {};
     currentIndex = 0;
+    currentStreak = 0; // [新增] 重設連擊
     shuffleAndReset(); 
     updateNavigation();
     updateStats();
@@ -748,8 +850,13 @@ function updateStats() {
     document.getElementById('accuracy').textContent = accuracy + '%';
     document.getElementById('practicedCount').textContent = checkedWords;
     
-    // 回傳統計物件，供完成檢查使用
-    return { totalWords, checkedWords, correctWords, incorrectWords, accuracy };
+    // 回傳統計物件
+    const stats = { totalWords, checkedWords, correctWords, incorrectWords, accuracy };
+    
+    // [新增] 檢查是否解鎖徽章
+    checkAndUnlockBadges(stats);
+
+    return stats;
 }
 
 // 開啟設定視窗
@@ -883,8 +990,14 @@ function saveWordSettings() {
 
 // 「恢復預設」的函式
 function restoreDefaultWords() {
-    if (confirm("您確定要清除所有自訂單字，並恢復為預設題庫嗎？")) {
+    if (confirm("您確定要清除所有自訂單字，並恢復為預設題庫嗎？\n（注意：這也會重設您的寵物等級和成就！）")) {
         localStorage.removeItem('customWords'); 
+        
+        // [新增] 同時清除遊戲化進度
+        localStorage.removeItem('totalXP');
+        localStorage.removeItem('unlockedBadges');
+        localStorage.removeItem('quizLengthLimit'); // [新增] 重設題數
+        
         alert("已恢復預設題庫，網頁將會重新整理。");
         
         // 恢復到國小等級
@@ -947,5 +1060,165 @@ async function fetchTranslation(word, element) {
     } catch (error) {
         console.error('Fetch translation error:', error);
         element.innerHTML = `<span class="translation">（翻譯載入錯誤）</span>`;
+    }
+}
+
+
+// --- [新增] 遊戲化功能函式 (v20 擴充) ---
+
+/**
+ * [新] 增加經驗值並更新
+ */
+function addXP(amount) {
+    totalXP += amount;
+    localStorage.setItem('totalXP', totalXP);
+    updatePetDisplay();
+}
+
+/**
+ * [新] 更新寵物/等級介面
+ */
+function updatePetDisplay() {
+    let currentPet = petLevels[0];
+    let nextLevelXP = petLevels[1].xp;
+
+    // 倒序尋找目前等級
+    for (let i = petLevels.length - 1; i >= 0; i--) {
+        if (totalXP >= petLevels[i].xp) {
+            currentPet = petLevels[i];
+            
+            // 找到下一個等級的 XP 門檻
+            if (i < petLevels.length - 1) {
+                nextLevelXP = petLevels[i + 1].xp;
+            } else {
+                nextLevelXP = petLevels[i].xp; // 已滿等
+            }
+            break;
+        }
+    }
+
+    // 計算經驗值條百分比
+    let xpForCurrentLevel = totalXP - currentPet.xp;
+    let xpToNextLevel = nextLevelXP - currentPet.xp;
+    let percentage = 0;
+    
+    if (xpToNextLevel > 0) { // 避免除以零
+        percentage = Math.min((xpForCurrentLevel / xpToNextLevel) * 100, 100);
+    } else if (totalXP >= nextLevelXP) { // 滿等
+        percentage = 100;
+        xpForCurrentLevel = xpToNextLevel; // 顯示為滿
+    }
+
+    // 更新 DOM 元素
+    const petNameEl = document.getElementById('petName');
+    
+    // [新增] 檢查是否進化 (名稱是否改變)
+    if (petNameEl.textContent !== currentPet.name && petNameEl.textContent !== '') {
+        const frameEl = document.querySelector('.pet-image-frame');
+        if (frameEl) {
+            frameEl.classList.add('evolve'); // 觸發動畫
+            setTimeout(() => {
+                frameEl.classList.remove('evolve'); // 動畫結束後移除 class
+            }, 800); // 800ms 必須和 CSS 動畫時間一致
+        }
+    }
+
+    document.getElementById('petImage').textContent = currentPet.image;
+    document.getElementById('petName').textContent = currentPet.name; // 名稱和圖片照常更新
+    document.getElementById('xpBarFill').style.width = `${percentage}%`;
+    
+    if (percentage === 100 && xpToNextLevel <= 0) { // 滿等狀態
+         document.getElementById('xpText').textContent = `XP: ${totalXP} (已滿等)`;
+    } else {
+         document.getElementById('xpText').textContent = `XP: ${xpForCurrentLevel} / ${xpToNextLevel}`;
+    }
+}
+
+/**
+ * [新] 開啟成就徽章 Modal
+ */
+function openBadgeModal() {
+    const modal = document.getElementById('badgeModal');
+    const grid = document.getElementById('badgeGrid');
+    grid.innerHTML = ''; // 清空
+
+    // 遍歷所有徽章
+    for (const badgeId in allBadges) {
+        const badge = allBadges[badgeId];
+        const isUnlocked = unlockedBadges.includes(badgeId);
+
+        const badgeEl = document.createElement('div');
+        badgeEl.className = isUnlocked ? 'badge-item badge-unlocked' : 'badge-item badge-locked';
+        
+        let desc = isUnlocked ? badge.desc : '（未解鎖）';
+        
+        badgeEl.innerHTML = `
+            <div class="badge-icon">${isUnlocked ? badge.icon : '❓'}</div>
+            <div class="badge-title">${isUnlocked ? badge.title : '？？？'}</div>
+            <div class="badge-desc">${desc}</div>
+        `;
+        grid.appendChild(badgeEl);
+    }
+    
+    modal.style.display = 'flex';
+}
+
+/**
+ * [新] 關閉成就徽章 Modal
+ */
+function closeBadgeModal() {
+    document.getElementById('badgeModal').style.display = 'none';
+}
+
+/**
+ * [新] 解鎖徽章 (如果尚未解鎖)
+ */
+function unlockBadge(badgeId) {
+    if (!unlockedBadges.includes(badgeId)) {
+        unlockedBadges.push(badgeId);
+        localStorage.setItem('unlockedBadges', JSON.stringify(unlockedBadges));
+        
+        const badge = allBadges[badgeId];
+        // 延遲 1 秒跳出提示，避免和「答對」提示衝突
+        setTimeout(() => {
+            alert(`🎖️ 解鎖新成就！ 🎖️\n\n${badge.icon} ${badge.title}\n${badge.desc}`);
+        }, 1000);
+    }
+}
+
+/**
+ * [修改 v20] 檢查並解鎖徽章 (擴充邏輯)
+ */
+function checkAndUnlockBadges(stats) {
+    // 檢查累積答對 (用 XP 估算，1 題約 10-15 XP)
+    if (totalXP >= 10) unlockBadge('first_correct');
+    if (totalXP >= 150) unlockBadge('correct_10'); // 約 10-15 題
+    if (totalXP >= 750) unlockBadge('correct_50'); // 約 50-75 題
+    if (totalXP >= 1500) unlockBadge('correct_100'); // 約 100-150 題
+    if (totalXP >= 7500) unlockBadge('correct_500'); // 約 500-750 題
+    if (totalXP >= 15000) unlockBadge('correct_1000'); // 約 1000-1500 題
+    
+    // 檢查連擊
+    if (currentStreak >= 5) unlockBadge('streak_5');
+    if (currentStreak >= 10) unlockBadge('streak_10');
+    if (currentStreak >= 25) unlockBadge('streak_25');
+
+    // 檢查是否完成測驗
+    if (stats.checkedWords > 0 && stats.checkedWords === stats.totalWords) {
+        // 探索徽章
+        if (currentLevel === 'custom') unlockBadge('custom_user');
+        if (currentLevel.startsWith('grade_')) unlockBadge('hanlin_user');
+        if (currentLevel === 'level2_junior') unlockBadge('junior_pass');
+        if (currentLevel === 'level3_senior') unlockBadge('senior_pass');
+        
+        // 技巧徽章
+        if (stats.accuracy === 100) {
+            if (stats.totalWords >= 20) {
+                unlockBadge('perfect_quiz');
+            }
+            if (stats.totalWords >= 100) { // 必須是 100 題的完美測驗
+                unlockBadge('perfect_100');
+            }
+        }
     }
 }

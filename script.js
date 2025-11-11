@@ -1,5 +1,5 @@
 // 這是 'script.js' 檔案
-// [最終整合版] v12 - 包含自訂題庫(自動翻譯 + 自動搜尋例句 + 手動輸入例句)
+// [最終整合版] v13 - 包含自訂題庫(自動翻譯 + 自動搜尋翻譯/例句 + 手動輸入例句)
 
 // 'words' 變數 - 用來存放 "目前" 正在練習的題庫 (已合併單元)
 let words = []; 
@@ -469,10 +469,17 @@ function displayPreviousResult() {
         cardElement.className = 'word-card incorrect';
     }
 
-    // [修改] 判斷是否為自訂題庫，若是，則呼叫 API 翻譯
+    // [修改] 判斷是否為自訂題庫
     if (currentLevel === 'custom') {
-        fetchTranslation(word, translationEl); // 注意：這裡是用 word 變數
+        // [新邏輯] 如果翻譯是 '（自動翻譯）'，才呼叫 API
+        if (translation === '（自動翻譯）') {
+            fetchTranslation(word, translationEl);
+        } else {
+            // 否則 (代表是從 words.js 抓到的)，直接顯示
+            translationEl.innerHTML = `<span class="translation">${translation}</span>`;
+        }
     } else {
+        // (非自訂題庫的原始邏輯)
         translationEl.innerHTML = `<span class="translation">${translation}</span>`;
     }
     
@@ -584,7 +591,7 @@ function speakWord(word, lang = "en-US") {
 
 // 發音功能 (播放英文單字 + 中文翻譯)
 function speakWordAndTranslation(englishWord, chineseWord, englishLang = "en-US") {
-    // 檢查中文是否為 "自訂" 或 "無例句"，如果是，就只唸英文
+    // [修改] 如果是自動翻譯的 placeholder，也只唸英文
     if (chineseWord.includes('（') || chineseWord.includes('(')) {
         speakWord(englishWord, englishLang);
         return;
@@ -654,10 +661,17 @@ function checkCurrentWord(wordObject) {
         wordCard.className = 'word-card incorrect';
     }
     
-    // [修改] 判斷是否為自訂題庫，若是，則呼叫 API 翻譯
+    // [修改] 判斷是否為自訂題庫
     if (currentLevel === 'custom') {
-        fetchTranslation(correctWord, translationEl);
+        // [新邏輯] 如果翻譯是 '（自動翻譯）'，才呼叫 API
+        if (translation === '（自動翻譯）') {
+            fetchTranslation(correctWord, translationEl);
+        } else {
+            // 否則 (代表是從 words.js 抓到的)，直接顯示
+            translationEl.innerHTML = `<span class="translation">${translation}</span>`;
+        }
     } else {
+        // (非自訂題庫的原始邏輯)
         translationEl.innerHTML = `<span class="translation">${translation}</span>`;
     }
     
@@ -813,7 +827,7 @@ function findWordInDatabase(wordToFind) {
     return null;
 }
 
-// 儲存設定 (自訂題庫)
+// [重大修改] 儲存設定 (自訂題庫) - 整合搜尋與手動輸入
 function saveWordSettings() {
     const text = document.getElementById('customWordsTextarea').value;
     const newWordsStrings = text.split('\n').map(w => w.trim()).filter(w => w);
@@ -826,30 +840,37 @@ function saveWordSettings() {
     const newWordsObjects = newWordsStrings.map(w => {
         const parts = w.split(';');
         const word = parts[0] ? parts[0].trim() : '';
-        
-        let sentence_en = parts[1] ? parts[1].trim() : '';
-        let sentence_zh = parts[2] ? parts[2].trim() : '';
+        if (!word) return null; // 略過空行
 
-        // [新邏輯] 如果使用者沒有提供英文例句，才去搜尋資料庫
-        if (word && !sentence_en) {
-            const foundWord = findWordInDatabase(word);
-            if (foundWord) {
-                sentence_en = foundWord.sentence_en;
-                sentence_zh = foundWord.sentence_zh;
-            }
+        // 檢查使用者是否手動輸入了例句
+        const user_s_en = parts[1] ? parts[1].trim() : '';
+        const user_s_zh = parts[2] ? parts[2].trim() : '';
+
+        let final_translation = '（自動翻譯）'; // 預設為 API 翻譯
+        let final_sentence_en = '（無例句）';
+        let final_sentence_zh = '（無例句）';
+
+        // 1. [新邏輯] 優先搜尋資料庫
+        const foundWord = findWordInDatabase(word);
+        if (foundWord) {
+            final_translation = foundWord.translation; // 找到就用資料庫的翻譯
+            final_sentence_en = foundWord.sentence_en;
+            final_sentence_zh = foundWord.sentence_zh;
         }
 
-        // 如果例句仍然是空的 (使用者沒給、資料庫也找不到)，才設為預設值
-        if (!sentence_en) sentence_en = '（無例句）';
-        if (!sentence_zh) sentence_zh = '（無例句）';
-
+        // 2. [新邏輯] 如果使用者有手動輸入例句 (user_s_en 非空)，則覆蓋掉資料庫的例句
+        if (user_s_en) {
+            final_sentence_en = user_s_en;
+            final_sentence_zh = user_s_zh ? user_s_zh : '（無例句）'; // 中文例句也必須以使用者的為主
+        }
+        
         return {
             word: word,
-            translation: '（自訂單字）', // 翻譯欄位保留，由 API 抓取
-            sentence_en: sentence_en,
-            sentence_zh: sentence_zh
+            translation: final_translation, // 可能是 "蘋果" 或 "（自動翻譯）"
+            sentence_en: final_sentence_en,
+            sentence_zh: final_sentence_zh
         };
-    }).filter(obj => obj.word); // 過濾掉沒有單字的空行
+    }).filter(obj => obj && obj.word); // 過濾掉所有 null 或沒有 word 的物件
 
     localStorage.setItem('customWords', JSON.stringify(newWordsObjects));
     

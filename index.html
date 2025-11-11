@@ -125,13 +125,22 @@
 
         <div id="wordSettingsModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:999; align-items:center; justify-content:center;">
             <div style="background:#fff; border-radius:8px; padding:20px; max-width:90vw; width:600px; box-shadow:0 2px 5px rgba(0,0,0,0.2); position:relative;">
-                <h2 style="margin-top:0;">設定「自訂題庫」</h2>
-                <p>請輸入單字，每行一個：</p>
-                <textarea id="customWordsTextarea" style="width:100%; height:250px; border-radius:5px; border:1px solid #ccc; padding:10px; box-sizing:border-box;" placeholder="請輸入自訂單字，每行一個..."></textarea>
-                
-                <div class="modal-buttons">
-                    <button class="btn-restore" onclick="restoreDefaultWords()">恢復預設題庫</button>
-                    <div>
+<h2 style="margin-top:0;">設定「自訂題庫」</h2>
+
+<p>請輸入單字，格式為 (分號分隔)：<br><b>英文單字;英文例句;中文例句</b></p>
+<textarea id="customWordsTextarea" style="width:100%; height:250px; border-radius:5px; border:1px solid #ccc; padding:10px; box-sizing:border-box;" 
+    placeholder="例如 (可自訂例句)：
+apple;I like to eat apples.;我喜歡吃蘋果。
+
+(若省略例句，系統會自動搜尋題庫)
+book
+pen
+
+(若題庫找不到，翻譯會自動翻譯單字)
+photosynthesis
+"></textarea>
+<div class="modal-buttons">
+    <button class="btn-restore" onclick="restoreDefaultWords()">恢復預設題庫</button>                    <div>
                         <button class="btn-cancel" onclick="closeWordSettings()">取消</button>
                         <button class="btn-save" onclick="saveWordSettings()">儲存</button>
                     </div>

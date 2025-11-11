@@ -1,3 +1,6 @@
+// 這是 'script.js' 檔案
+// [最終整合版] v12 - 包含自訂題庫(自動翻譯 + 自動搜尋例句 + 手動輸入例句)
+
 // 'words' 變數 - 用來存放 "目前" 正在練習的題庫 (已合併單元)
 let words = []; 
 
@@ -740,10 +743,27 @@ function openWordSettings() {
     const modal = document.getElementById('wordSettingsModal');
     modal.style.display = 'flex'; 
     
-    // 只有在「自訂題庫」模式下才載入儲存的單字，否則清空
+    // [修改] 載入自訂單字，並格式化回 "單字;例句" 格式
     if (currentLevel === 'custom') {
         const customWords = JSON.parse(localStorage.getItem('customWords')) || [];
-        document.getElementById('customWordsTextarea').value = customWords.map(w => w.word).join('\n');
+        
+        const textValue = customWords.map(w => {
+            // 只有當例句不是預設值時才把它組合回去
+            const s_en = (w.sentence_en && w.sentence_en !== '（無例句）') ? w.sentence_en : '';
+            const s_zh = (w.sentence_zh && w.sentence_zh !== '（無例句）') ? w.sentence_zh : '';
+            
+            // 組合，並清除尾端多餘的分號
+            let line = w.word;
+            if (s_en || s_zh) {
+                line += `;${s_en}`;
+            }
+            if (s_zh) {
+                line += `;${s_zh}`;
+            }
+            return line;
+        }).join('\n');
+        
+        document.getElementById('customWordsTextarea').value = textValue;
     } else {
         document.getElementById('customWordsTextarea').value = '';
     }
@@ -753,6 +773,44 @@ function openWordSettings() {
 // 關閉設定視Window
 function closeWordSettings() {
     document.getElementById('wordSettingsModal').style.display = 'none'; 
+}
+
+/**
+ * [新功能] 在 'words.js' 中搜尋單字，回傳找到的物件或 null
+ */
+function findWordInDatabase(wordToFind) {
+    if (!wordToFind || typeof baseWordLists === 'undefined') {
+        return null;
+    }
+    const targetWord = wordToFind.toLowerCase();
+
+    // 1. 搜尋 Level 1 到 Level 5
+    const levelsToSearch = ['level1_element', 'level2_junior', 'level3_senior', 'level4_college', 'level5_business'];
+    for (const level of levelsToSearch) {
+        const wordList = baseWordLists[level] || [];
+        const found = wordList.find(w => w.word.toLowerCase() === targetWord);
+        if (found) {
+            return found; // 找到就回傳
+        }
+    }
+
+    // 2. 搜尋 Level 6 (翰林)
+    const hanlinData = baseWordLists.level6_hanlin || {};
+    // 迭代所有年級 (e.g., 'grade_7A')
+    for (const gradeKey in hanlinData) {
+        const grade = hanlinData[gradeKey] || {};
+        // 迭代該年級所有單元 (e.g., 'Unit1')
+        for (const unitKey in grade) {
+            const unitList = grade[unitKey] || [];
+            const found = unitList.find(w => w.word.toLowerCase() === targetWord);
+            if (found) {
+                return found; // 找到就回傳
+            }
+        }
+    }
+
+    // 都找不到
+    return null;
 }
 
 // 儲存設定 (自訂題庫)
@@ -765,12 +823,33 @@ function saveWordSettings() {
         return;
     }
 
-    const newWordsObjects = newWordsStrings.map(w => ({
-        word: w,
-        translation: '（自訂單字）',
-        sentence_en: '（無例句）',
-        sentence_zh: '（無例句）'
-    }));
+    const newWordsObjects = newWordsStrings.map(w => {
+        const parts = w.split(';');
+        const word = parts[0] ? parts[0].trim() : '';
+        
+        let sentence_en = parts[1] ? parts[1].trim() : '';
+        let sentence_zh = parts[2] ? parts[2].trim() : '';
+
+        // [新邏輯] 如果使用者沒有提供英文例句，才去搜尋資料庫
+        if (word && !sentence_en) {
+            const foundWord = findWordInDatabase(word);
+            if (foundWord) {
+                sentence_en = foundWord.sentence_en;
+                sentence_zh = foundWord.sentence_zh;
+            }
+        }
+
+        // 如果例句仍然是空的 (使用者沒給、資料庫也找不到)，才設為預設值
+        if (!sentence_en) sentence_en = '（無例句）';
+        if (!sentence_zh) sentence_zh = '（無例句）';
+
+        return {
+            word: word,
+            translation: '（自訂單字）', // 翻譯欄位保留，由 API 抓取
+            sentence_en: sentence_en,
+            sentence_zh: sentence_zh
+        };
+    }).filter(obj => obj.word); // 過濾掉沒有單字的空行
 
     localStorage.setItem('customWords', JSON.stringify(newWordsObjects));
     

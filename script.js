@@ -1,5 +1,3 @@
-// 這是 'script.js' 檔案 (v11 - 最終修復版)
-
 // 'words' 變數 - 用來存放 "目前" 正在練習的題庫 (已合併單元)
 let words = []; 
 
@@ -468,7 +466,12 @@ function displayPreviousResult() {
         cardElement.className = 'word-card incorrect';
     }
 
-    translationEl.innerHTML = `<span class="translation">${translation}</span>`;
+    // [修改] 判斷是否為自訂題庫，若是，則呼叫 API 翻譯
+    if (currentLevel === 'custom') {
+        fetchTranslation(word, translationEl); // 注意：這裡是用 word 變數
+    } else {
+        translationEl.innerHTML = `<span class="translation">${translation}</span>`;
+    }
     
     // 正確建立按鈕和事件
     const sentenceEnSpan = document.createElement('span');
@@ -648,7 +651,12 @@ function checkCurrentWord(wordObject) {
         wordCard.className = 'word-card incorrect';
     }
     
-    translationEl.innerHTML = `<span class="translation">${translation}</span>`;
+    // [修改] 判斷是否為自訂題庫，若是，則呼叫 API 翻譯
+    if (currentLevel === 'custom') {
+        fetchTranslation(correctWord, translationEl);
+    } else {
+        translationEl.innerHTML = `<span class="translation">${translation}</span>`;
+    }
     
     // 正確建立按鈕和事件
     const sentenceEnSpan = document.createElement('span');
@@ -802,3 +810,42 @@ document.addEventListener('DOMContentLoaded', () => {
         guideContent.style.display = 'none';
     }
 });
+
+
+/**
+ * [新功能] 獲取單字翻譯並更新 UI
+ * @param {string} word - 要翻譯的英文單字
+ * @param {HTMLElement} element - 要顯示翻譯的 HTML 元素 (translationEl)
+ */
+async function fetchTranslation(word, element) {
+    // 顯示載入中...
+    element.innerHTML = `<span class="translation">（正在翻譯...）</span>`;
+
+    try {
+        // 使用免費的 MyMemory API (英文 翻譯到 繁體中文)
+        const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|zh-TW`);
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const data = await response.json();
+        
+        // 檢查 API 是否成功返回翻譯
+        if (data.responseData && data.responseData.translatedText) {
+            let translated = data.responseData.translatedText;
+            
+            // 過濾掉 API 可能返回的錯誤訊息
+            if (translated.includes('NO QUERY SPECIFIED') || translated.includes('INVALID LANGUAGE PAIR')) {
+                 element.innerHTML = `<span class="translation">（無法翻譯此單字）</span>`;
+            } else {
+                 element.innerHTML = `<span class="translation">${translated}</span>`;
+            }
+        } else {
+            element.innerHTML = `<span class="translation">（翻譯失敗）</span>`;
+        }
+    } catch (error) {
+        console.error('Fetch translation error:', error);
+        element.innerHTML = `<span class="translation">（翻譯載入錯誤）</span>`;
+    }
+}
